@@ -1,4 +1,4 @@
-# SubspaceAD
+# CVPR26 SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling
 
 <p align="center">
   <a href="https://huggingface.co/spaces/MoxVox/SubspaceAD-visual-demo" target="_blank">
@@ -8,8 +8,7 @@
 
 This repository contains the official implementation of the paper:
 
-> [**SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling (CVPR2026)**](https://arxiv.org/abs/2602.23013)
-
+> [**SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling (CVPR 2026)**](https://openaccess.thecvf.com/content/CVPR2026/html/Lendering_SubspaceAD_Training-Free_Few-Shot_Anomaly_Detection_via_Subspace_Modeling_CVPR_2026_paper.html)
 ---
 
 <p align="center"> <img src="assets/subspacead_overview.png" width="85%"> </p>
@@ -190,13 +189,11 @@ python main.py \
 If you find this repository useful, please consider citing:
 
 ```bibtex
-@misc{lendering2026subspaceadtrainingfreefewshotanomaly,
-      title={SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling}, 
-      author={Camile Lendering and Erkut Akdag and Egor Bondarev},
-      year={2026},
-      eprint={2602.23013},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2602.23013}, 
+@inproceedings{lendering2026subspacead,
+  title={SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling},
+  author={Lendering, Camile and Akdag, Erkut and Bondarev, Egor},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages={28557--28566},
+  year={2026}
 }
 ```
