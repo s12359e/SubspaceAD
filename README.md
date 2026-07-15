@@ -1,4 +1,4 @@
-# CVPR26 SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling
+# SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling (CVPR26)
 
 <p align="center">
   <a href="https://huggingface.co/spaces/MoxVox/SubspaceAD-visual-demo" target="_blank">
