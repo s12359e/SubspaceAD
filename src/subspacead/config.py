@@ -50,7 +50,7 @@ def get_args():
     model_group.add_argument(
         "--model_ckpt",
         type=str,
-        default="facebook/dinov2-with-registers-large",
+        default="facebook/dinov3-vitb16-pretrain-lvd1689m",
         help=(
             "HuggingFace model checkpoint for feature extraction. Supports "
             "DINOv2 (e.g. facebook/dinov2-with-registers-giant) and DINOv3 ViT "
@@ -93,8 +93,14 @@ def get_args():
     model_group.add_argument(
         "--layers",
         type=str,
-        default="-12,-13,-14,-15,-16,-17,-18",
-        help="Comma-separated layer indices for 'concat' or 'mean' aggregation.",
+        default="2,5,8,11",
+        help=(
+            "Comma-separated layer indices for 'concat' or 'mean' aggregation. "
+            "Indices address the model's hidden_states (0 = patch embeddings, "
+            "positive i = output of the i-th transformer block, negative "
+            "indices count from the last block). Default targets DINOv3 "
+            "ViT-B/16 (12 blocks)."
+        ),
     )
     model_group.add_argument(
         "--grouped_layers",

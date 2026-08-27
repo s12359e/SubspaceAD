@@ -16,15 +16,15 @@ eval "$($CONDA_EXE shell.bash hook)"
 conda activate subspacead
 
 # DINOv3 checkpoints are gated on HuggingFace: request access at
-# https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m
+# https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m
 # and authenticate with `hf auth login` (or set HF_TOKEN) before running.
 
-# DINOv3 backbone. ViT-L/16 has 24 transformer layers; the layer indices
-# below are the proportional equivalent of the DINOv2-giant (40-layer)
-# setting used in the paper. For facebook/dinov3-vit7b16-pretrain-lvd1689m
-# (40 layers) you can reuse the original "-12,...,-18" indices.
-MODEL_CKPT="facebook/dinov3-vitl16-pretrain-lvd1689m"
-LAYERS="-7,-8,-9,-10,-11"
+# DINOv3 backbone. ViT-B/16 has 12 transformer blocks; indices address the
+# model's hidden_states (positive i = output of the i-th block). For deeper
+# variants adjust accordingly, e.g. "-7,...,-11" for ViT-L/16 (24 blocks) or
+# the original "-12,...,-18" for ViT-7B/16 (40 blocks).
+MODEL_CKPT="facebook/dinov3-vitb16-pretrain-lvd1689m"
+LAYERS="2,5,8,11"
 
 # DINOv3 uses patch size 16, so image_res must be a multiple of 16.
 # 672 = 42 x 16 gives a 42x42 patch grid.
@@ -53,7 +53,7 @@ do
         --pca_ev 0.99 \
         --seed 42 \
         --agg_method "mean" \
-        --outdir "few_shot_results/results_k${k}_mvtec_dinov3L"
+        --outdir "few_shot_results/results_k${k}_mvtec_dinov3B"
 done
 
 
@@ -72,7 +72,7 @@ do
         --pca_ev 0.99 \
         --agg_method "mean" \
         --seed 42 \
-        --outdir "few_shot_results/results_k${k}_visa_dinov3L"
+        --outdir "few_shot_results/results_k${k}_visa_dinov3B"
 done
 
 echo "--- All experiments complete ---"
