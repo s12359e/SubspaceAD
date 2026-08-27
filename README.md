@@ -11,10 +11,6 @@ This repository contains the official implementation of the paper:
 > [**SubspaceAD: Training-Free Few-Shot Anomaly Detection via Subspace Modeling (CVPR 2026)**](https://openaccess.thecvf.com/content/CVPR2026/html/Lendering_SubspaceAD_Training-Free_Few-Shot_Anomaly_Detection_via_Subspace_Modeling_CVPR_2026_paper.html)
 ---
 
-<p align="center"> <img src="assets/subspacead_overview.png" width="85%"> </p>
-
-Figure 1. SubspaceAD consists of two training-free stages: (1) extracting DINOv2 patch features from a few normal exemplars, and (2) estimating a low-dimensional PCA subspace to model normal appearance. Anomalies are detected via reconstruction residuals.
-
 ## Introduction
 
 Detecting visual anomalies in industrial inspection often requires operating with only a few normal exemplars per category. While many recent approaches rely on large memory banks, auxiliary datasets, or multi-modal tuning, **SubspaceAD** introduces a minimalist, training-free alternative.
@@ -33,27 +29,6 @@ Despite its simplicity, SubspaceAD achieves **state-of-the-art** performance in 
 * **VisA:** 93.4% Image AUROC; 98.2% Pixel AUROC
 
 ---
-
-<p align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <img src="assets/mvtec_examples.png" height="250">
-        <br>
-        <sub><b>MVTec-AD</b></sub>
-      </td>
-      <td align="center">
-        <img src="assets/visa_examples.png" height="250">
-        <br>
-        <sub><b>VisA </b></sub>
-      </td>
-    </tr>
-  </table>
-</p>
-
-<p align="left"><i>Figure 2. Qualitative comparison on VisA and MVTec-AD (1-shot). SubspaceAD produces sharper and more precise anomaly maps than
-PromptAD and AnomalyDINO, with fewer false activations and better alignment with ground-truth defects across both datasets.</i></p>
-
 
 ## Environment Setup
 
