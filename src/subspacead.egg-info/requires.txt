@@ -1,6 +1,0 @@
-torch
-torchvision
-transformers
-opencv-python
-kornia
-anomalib

@@ -40,7 +40,6 @@ src/subspacead/
 └── utils/                   # Logging, run naming, visualization
 scripts/                     # SLURM/bash scripts reproducing all paper results
 tools/prepare_visa.py        # VisA folder-structure preprocessing
-index.html, style.css        # GitHub Pages project page (static, self-contained)
 ```
 
 ## Setup and Commands
@@ -114,8 +113,8 @@ bash scripts/benchmark_few_shot_dinov3.sh # DINOv3 ViT-B/16
   "simplify" them.
 - **Seeding matters:** `--seed` controls the k-shot exemplar selection, so
   results are seed-sensitive by design. Benchmark scripts pin `--seed 42`.
-- `src/subspacead.egg-info/` and `__pycache__/` are unfortunately tracked in
-  git; don't add more build artifacts to commits.
+- Build artifacts (`__pycache__/`, `*.egg-info/`) are gitignored; don't add
+  them (or other generated files) to commits.
 
 ## Conventions
 
