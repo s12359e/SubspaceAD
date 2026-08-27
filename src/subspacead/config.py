@@ -51,7 +51,13 @@ def get_args():
         "--model_ckpt",
         type=str,
         default="facebook/dinov2-with-registers-large",
-        help="HuggingFace model checkpoint for feature extraction.",
+        help=(
+            "HuggingFace model checkpoint for feature extraction. Supports "
+            "DINOv2 (e.g. facebook/dinov2-with-registers-giant) and DINOv3 ViT "
+            "(e.g. facebook/dinov3-vitl16-pretrain-lvd1689m; gated on HF, "
+            "requires login). DINOv3 uses patch size 16, so image_res should "
+            "be a multiple of 16."
+        ),
     )
     model_group.add_argument(
         "--image_res", type=int, default=256, help="Image resolution for the model."

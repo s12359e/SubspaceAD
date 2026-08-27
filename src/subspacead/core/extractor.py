@@ -14,15 +14,54 @@ class FeatureExtractor:
     def __init__(self, model_ckpt: str):
         logging.info(f"Loading feature extraction model: {model_ckpt}...")
         self.processor = AutoImageProcessor.from_pretrained(model_ckpt)
-        self.model = AutoModel.from_pretrained(model_ckpt).eval().to(DEVICE)
         try:
-            self.model.set_attn_implementation("eager")
-            logging.info("Set model attention implementation to 'eager'.")
-        except AttributeError:
-            logging.warning(
-                "Could not set attention implementation. Saliency masking might fail."
+            # Eager attention is required so output_attentions returns real
+            # weights (used for the DINO saliency mask).
+            self.model = AutoModel.from_pretrained(
+                model_ckpt, attn_implementation="eager"
             )
-        logging.info("Model loaded successfully.")
+        except (ValueError, TypeError):
+            self.model = AutoModel.from_pretrained(model_ckpt)
+            try:
+                self.model.set_attn_implementation("eager")
+                logging.info("Set model attention implementation to 'eager'.")
+            except AttributeError:
+                logging.warning(
+                    "Could not set attention implementation. Saliency masking might fail."
+                )
+        self.model = self.model.eval().to(DEVICE)
+
+        if not hasattr(self.model.config, "patch_size"):
+            raise ValueError(
+                f"Model '{model_ckpt}' does not expose a patch_size and cannot "
+                "produce a patch-token grid. Use a ViT-style backbone such as "
+                "facebook/dinov2-with-registers-* or facebook/dinov3-vit* "
+                "(DINOv3 ConvNeXt variants are not supported)."
+            )
+        self.patch_size = self.model.config.patch_size
+        self.num_register_tokens = getattr(
+            self.model.config, "num_register_tokens", 0
+        )
+        logging.info(
+            f"Model loaded successfully (patch_size={self.patch_size}, "
+            f"num_register_tokens={self.num_register_tokens})."
+        )
+
+    def effective_resolution(self, res: int) -> int:
+        """
+        Snaps a requested resolution to the nearest multiple of the model's
+        patch size (e.g. 14 for DINOv2, 16 for DINOv3) so the token sequence
+        forms an exact patch grid.
+        """
+        ps = self.patch_size
+        if res % ps == 0:
+            return res
+        snapped = max(ps, round(res / ps) * ps)
+        logging.warning(
+            f"image_res {res} is not divisible by the model patch size {ps}; "
+            f"using {snapped} instead."
+        )
+        return snapped
 
     def _apply_clahe(self, pil_imgs: list) -> list:
         """Applies CLAHE to a list of PIL images."""
@@ -155,6 +194,8 @@ class FeatureExtractor:
         """
 
         # 1. Preprocessing
+        res = self.effective_resolution(res)
+
         if use_clahe:
             pil_imgs = self._apply_clahe(pil_imgs)
 
@@ -189,13 +230,22 @@ class FeatureExtractor:
             )
 
         # 3. Setup Parameters
-        cfg = self.model.config
-        ps = cfg.patch_size
-        num_reg = getattr(cfg, "num_register_tokens", 0)
+        ps = self.patch_size
+        num_reg = self.num_register_tokens
         drop_front = 1 + num_reg  # CLS token + register tokens
         h_p, w_p = res // ps, res // ps
         n_expected = h_p * w_p
         batch_size = inputs.pixel_values.shape[0]
+
+        seq_len = hidden_states[-1].shape[1]
+        if seq_len != drop_front + n_expected:
+            raise ValueError(
+                f"Unexpected token layout: model returned {seq_len} tokens but "
+                f"expected {drop_front + n_expected} "
+                f"(1 CLS + {num_reg} register + {n_expected} patch tokens for a "
+                f"{h_p}x{w_p} grid at res {res}, patch size {ps}). "
+                "Check that the backbone is a supported DINOv2/DINOv3 ViT."
+            )
 
         # 4. Saliency Mask Extraction
         saliency_mask = self._get_saliency_mask(

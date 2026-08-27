@@ -67,6 +67,35 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+## Using DINOv3 Backbones
+
+The feature extractor also supports [DINOv3](https://github.com/facebookresearch/dinov3) ViT backbones via HuggingFace (`transformers>=4.56`). Notes:
+
+1. **Gated access:** DINOv3 checkpoints are gated on HuggingFace. Request access on the [model page](https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m) and authenticate with `hf auth login` (or set `HF_TOKEN`) before running.
+2. **Patch size:** DINOv3 uses patch size **16** (DINOv2 uses 14), so `--image_res` should be a multiple of 16 (e.g. 672 = 42×16). Non-multiples are automatically snapped to the nearest multiple with a warning.
+3. **Layer indices:** `--layers` are indexed from the end of the backbone, so adjust them to the model depth (ViT-S/B: 12, ViT-L: 24, ViT-H+: 32, ViT-7B: 40 layers).
+4. **ViT only:** DINOv3 ConvNeXt variants do not produce a patch-token grid and are not supported.
+
+Supported checkpoints include `facebook/dinov3-vits16-pretrain-lvd1689m`, `facebook/dinov3-vitb16-pretrain-lvd1689m`, `facebook/dinov3-vitl16-pretrain-lvd1689m`, `facebook/dinov3-vith16plus-pretrain-lvd1689m`, and `facebook/dinov3-vit7b16-pretrain-lvd1689m`.
+
+Example (1-shot MVTec-AD on `bottle` with DINOv3 ViT-L/16):
+
+```bash
+python main.py \
+    --dataset_name mvtec_ad \
+    --dataset_path datasets/mvtec-ad \
+    --categories bottle \
+    --model_ckpt facebook/dinov3-vitl16-pretrain-lvd1689m \
+    --image_res 672 \
+    --layers="-7,-8,-9,-10,-11" \
+    --k_shot 1 \
+    --aug_count 30 \
+    --pca_ev 0.99 \
+    --outdir results/debug_run_dinov3
+```
+
+A full benchmark script is provided at `scripts/benchmark_few_shot_dinov3.sh`. The paper's results were obtained with DINOv2 (`facebook/dinov2-with-registers-giant`); DINOv3 layer choices may need re-tuning for best performance.
+
 ## Data Preparation
 
 ### MVTec-AD
